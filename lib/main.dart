@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
+import 'package:video_recorder/test.dart';
 
 class CameraExampleHome extends StatefulWidget {
   @override
@@ -70,35 +71,29 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     );
   }
 
-  Widget _unknownWidgetView(){
+  Widget _unknownWidgetView() {
     return Padding(
-      padding: const EdgeInsets.all(5.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Text("Hola mundo 1"),
-          Text("Hola Mundo 2")
-
-        ],
-      )
-    );
+        padding: const EdgeInsets.all(5.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[_cameraTogglesRowWidget(), Text("Hola Mundo 2")],
+        ));
   }
 
-  Widget _surfaceCameraView(){
+  Widget _surfaceCameraView() {
     return Expanded(
         child: Container(
-          child: Padding(
-              padding: const EdgeInsets.all(1.0),
-              child: Center(child: _cameraPreviewWidget())),
-          decoration: BoxDecoration(
-              color: Colors.black,
-              border: Border.all(
-                  width: 3.0,
-                  color:
-                  controller != null && controller.value.isRecordingVideo
-                      ? Colors.redAccent
-                      : Colors.grey)),
-        ));
+      child: Padding(
+          padding: const EdgeInsets.all(1.0),
+          child: Center(child: _cameraPreviewWidget())),
+      decoration: BoxDecoration(
+          color: Colors.black,
+          border: Border.all(
+              width: 3.0,
+              color: controller != null && controller.value.isRecordingVideo
+                  ? Colors.redAccent
+                  : Colors.grey)),
+    ));
   }
 
   Widget _cameraPreviewWidget() {
@@ -180,12 +175,31 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
         ));
   }
 
+  /// Selector of front Camera and main Camera
   Widget _cameraTogglesRowWidget() {
     final List<Widget> toggles = <Widget>[];
 
     if (cameras.isEmpty) {
-
+      return const Text('No camera found');
+    } else {
+      for (CameraDescription cameraDescription in cameras) {
+        toggles.add(SizedBox(
+            width: 90.0,
+            child: RadioListTile<CameraDescription>(
+                title: Icon(getCameraLensIcon(cameraDescription.lensDirection)),
+                groupValue: cameraDescription,
+                onChanged:
+                    controller != null && controller.value.isRecordingVideo
+                        ? null
+                        : onNewCameraSelected)));
+      }
     }
+    return Row(children: toggles);
+  }
+
+  /// Display the thumbnail of the captured image or video
+  Widget _thumbnailWidget() {
+    return null;
   }
 
   void onTakePictureButtonPressed() {}
