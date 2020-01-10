@@ -14,6 +14,19 @@ class CameraExampleHome extends StatefulWidget {
   }
 }
 
+/// Returns a suitable camera icon for [direction].
+IconData getCameraLensIcon(CameraLensDirection direction) {
+  switch (direction) {
+    case CameraLensDirection.back:
+      return Icons.camera_rear;
+    case CameraLensDirection.front:
+      return Icons.camera_front;
+    case CameraLensDirection.external:
+      return Icons.camera;
+  }
+  throw ArgumentError('Unknown lens direction');
+}
+
 void logError(String code, String message) =>
     print('Error: $code\nError Message: $message');
 
@@ -27,6 +40,8 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   bool enableAudio = true;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
 
   @override
   void initState() {
@@ -65,18 +80,18 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
           _surfaceCameraView(),
           _captureControlRowWidget(),
           _toggleAudioWidget(),
-          _unknownWidgetView()
+          _toggleCameraSelector()
         ],
       ),
     );
   }
 
-  Widget _unknownWidgetView() {
+  Widget _toggleCameraSelector() {
     return Padding(
         padding: const EdgeInsets.all(5.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[_cameraTogglesRowWidget(), Text("Hola Mundo 2")],
+          children: <Widget>[_cameraTogglesRowWidget(), _thumbnailWidget()],
         ));
   }
 
@@ -110,6 +125,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     }
   }
 
+  /// Display the control bar with buttons to take pictures and record videos
   Widget _captureControlRowWidget() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -156,6 +172,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     );
   }
 
+  /// Toggle recording audio
   Widget _toggleAudioWidget() {
     return Padding(
         padding: const EdgeInsets.only(left: 25),
@@ -187,7 +204,8 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
             width: 90.0,
             child: RadioListTile<CameraDescription>(
                 title: Icon(getCameraLensIcon(cameraDescription.lensDirection)),
-                groupValue: cameraDescription,
+                groupValue: controller?.description,
+                value: cameraDescription,
                 onChanged:
                     controller != null && controller.value.isRecordingVideo
                         ? null
@@ -199,20 +217,79 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
 
   /// Display the thumbnail of the captured image or video
   Widget _thumbnailWidget() {
-    return null;
+    return Expanded(
+        child: Align(
+      alignment: Alignment.centerRight,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          videoController == null && imagePath == null
+              ? Container()
+              : SizedBox(
+                  width: 64.0,
+                  height: 64.0,
+                  child: (videoController == null)
+                      ? Image.file(File(imagePath))
+                      : Container(
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.pink)),
+                          child: Center(
+                              child: AspectRatio(
+                            child: VideoPlayer(videoController),
+                            aspectRatio: videoController.value.size != null
+                                ? videoController.value.aspectRatio
+                                : 1.0,
+                          )),
+                        ))
+        ],
+      ),
+    ));
   }
 
-  void onTakePictureButtonPressed() {}
 
-  void onVideoRecordButtonPressed() {}
+  /// Take Picture
+  void onTakePictureButtonPressed() {
+    takePicture().then((String filePath) {
+      if (mounted) {
+        setState(() {
+          imagePath = filePath;
+          videoController?.dispose();
+          videoController = null;
+        });
+        if (filePath != null)
+          showInSnackBar('Picture saved to ${filePath}');
+      }
+    });
+  }
 
-  void onResumeButtonPressed() {}
+  /// Record Video
+  void onVideoRecordButtonPressed() {
+    startVideoRecording().then((String filePath) {
+      if (mounted) setState(() {});
+      if (filePath != null) showInSnackBar('Saving video to ${filePath}');
+    });
+  }
 
-  void onPauseButtonPressed() {}
+  void onStopButtonPressed() {
+    stopVideoRecording().then((_) {
+      if (mounted) setState(() {});
+      showInSnackBar('Video recorded to: $videoPath');
+    });
+  }
 
-  void onStopButtonPressed() {}
+  void onPauseButtonPressed() {
+    pauseVideoRecording().then((_) {
+      if (mounted) setState(() {});
+      showInSnackBar('Video recording paused');
+    });
+  }
 
-  String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
+  void onResumeButtonPressed() {
+    resumeVideoRecording().then((_) {
+      if (mounted) setState(() {});
+      showInSnackBar('Video recording resumed');
+    });
+  }
 
   void showInSnackBar(String message) {
     _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(message)));
@@ -239,6 +316,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     }
   }
 
+  /// Takes Picture
   Future<String> takePicture() async {
     if (!controller.value.isInitialized) {
       showInSnackBar('Error: select a camera first.');
@@ -261,6 +339,98 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     }
 
     return filePath;
+  }
+
+  /// Starts Recording Video
+  Future<String> startVideoRecording() async {
+    if (!controller.value.isInitialized) {
+      showInSnackBar('Error: select a camera first.');
+      return null;
+    }
+
+    final Directory extDir = await getApplicationDocumentsDirectory();
+    final String dirPath = '${extDir.path}/Movies/flutter_test';
+    await Directory(dirPath).create(recursive: true);
+    final String filePath = '$dirPath/${timestamp()}.mp4';
+
+    if (controller.value.isRecordingVideo) {
+      // A recording is already started, do nothing.
+      return null;
+    }
+
+    try {
+      videoPath = filePath;
+      await controller.startVideoRecording(filePath);
+    } on CameraException catch (e){
+      _showCameraException(e);
+      return null;
+    }
+
+    return filePath;
+}
+
+  Future<void> stopVideoRecording() async {
+    if (!controller.value.isRecordingVideo) {
+      return null;
+    }
+
+    try {
+      await controller.stopVideoRecording();
+    } on CameraException catch (e) {
+      _showCameraException(e);
+      return null;
+    }
+
+    await _startVideoPlayer();
+  }
+
+  Future<void> pauseVideoRecording() async {
+    if (!controller.value.isRecordingVideo) {
+      return null;
+    }
+
+    try {
+      await controller.pauseVideoRecording();
+    } on CameraException catch (e) {
+      _showCameraException(e);
+      rethrow;
+    }
+  }
+
+  Future<void> resumeVideoRecording() async {
+    if (!controller.value.isRecordingVideo) {
+      return null;
+    }
+
+    try {
+      await controller.resumeVideoRecording();
+    } on CameraException catch (e) {
+      _showCameraException(e);
+      rethrow;
+    }
+  }
+
+  Future<void> _startVideoPlayer() async {
+    final VideoPlayerController vcontroller =
+    VideoPlayerController.file(File(videoPath));
+    videoPlayerListener = () {
+      if (videoController != null && videoController.value.size != null) {
+        // Refreshing the state to update video player with the correct ratio.
+        if (mounted) setState(() {});
+        videoController.removeListener(videoPlayerListener);
+      }
+    };
+    vcontroller.addListener(videoPlayerListener);
+    await vcontroller.setLooping(true);
+    await vcontroller.initialize();
+    await videoController?.dispose();
+    if (mounted) {
+      setState(() {
+        imagePath = null;
+        videoController = vcontroller;
+      });
+    }
+    await vcontroller.play();
   }
 
   void _showCameraException(CameraException e) {
