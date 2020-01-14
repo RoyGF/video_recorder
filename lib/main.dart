@@ -5,7 +5,6 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
-import 'package:video_recorder/test.dart';
 
 class CameraExampleHome extends StatefulWidget {
   @override
@@ -246,7 +245,6 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     ));
   }
 
-
   /// Take Picture
   void onTakePictureButtonPressed() {
     takePicture().then((String filePath) {
@@ -256,8 +254,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
           videoController?.dispose();
           videoController = null;
         });
-        if (filePath != null)
-          showInSnackBar('Picture saved to ${filePath}');
+        if (filePath != null) showInSnackBar('Picture saved to ${filePath}');
       }
     });
   }
@@ -361,13 +358,13 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     try {
       videoPath = filePath;
       await controller.startVideoRecording(filePath);
-    } on CameraException catch (e){
+    } on CameraException catch (e) {
       _showCameraException(e);
       return null;
     }
 
     return filePath;
-}
+  }
 
   Future<void> stopVideoRecording() async {
     if (!controller.value.isRecordingVideo) {
@@ -412,7 +409,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
 
   Future<void> _startVideoPlayer() async {
     final VideoPlayerController vcontroller =
-    VideoPlayerController.file(File(videoPath));
+        VideoPlayerController.file(File(videoPath));
     videoPlayerListener = () {
       if (videoController != null && videoController.value.size != null) {
         // Refreshing the state to update video player with the correct ratio.
