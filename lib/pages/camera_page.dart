@@ -5,11 +5,16 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
+import 'package:video_recorder/models/question.dart';
 
-class CameraExampleHome extends StatefulWidget {
+class RecordVideoPage extends StatefulWidget {
+  final Question question;
+
+  RecordVideoPage(this.question);
+
   @override
-  _CameraExampleHomeState createState() {
-    return _CameraExampleHomeState();
+  _RecordVideoPageState createState() {
+    return _RecordVideoPageState();
   }
 }
 
@@ -29,7 +34,7 @@ IconData getCameraLensIcon(CameraLensDirection direction) {
 void logError(String code, String message) =>
     print('Error: $code\nError Message: $message');
 
-class _CameraExampleHomeState extends State<CameraExampleHome>
+class _RecordVideoPageState extends State<RecordVideoPage>
     with WidgetsBindingObserver {
   CameraController controller;
   String imagePath;
@@ -37,6 +42,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   VideoPlayerController videoController;
   VoidCallback videoPlayerListener;
   bool enableAudio = true;
+  List<CameraDescription> cameras = [];
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -45,7 +51,9 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    _initCameras().then((_) {
+      WidgetsBinding.instance.addObserver(this);
+    });
   }
 
   @override
@@ -97,17 +105,17 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   Widget _surfaceCameraView() {
     return Expanded(
         child: Container(
-          child: Padding(
-              padding: const EdgeInsets.all(1.0),
-              child: Center(child: _cameraPreviewWidget())),
-          decoration: BoxDecoration(
-              color: Colors.black,
-              border: Border.all(
-                  width: 3.0,
-                  color: controller != null && controller.value.isRecordingVideo
-                      ? Colors.redAccent
-                      : Colors.grey)),
-        ));
+      child: Padding(
+          padding: const EdgeInsets.all(1.0),
+          child: Center(child: _cameraPreviewWidget())),
+      decoration: BoxDecoration(
+          color: Colors.black,
+          border: Border.all(
+              width: 3.0,
+              color: controller != null && controller.value.isRecordingVideo
+                  ? Colors.redAccent
+                  : Colors.grey)),
+    ));
   }
 
   Widget _cameraPreviewWidget() {
@@ -134,16 +142,16 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
             icon: const Icon(Icons.camera_alt),
             color: Colors.blue,
             onPressed: controller != null &&
-                controller.value.isInitialized &&
-                !controller.value.isRecordingVideo
+                    controller.value.isInitialized &&
+                    !controller.value.isRecordingVideo
                 ? onTakePictureButtonPressed
                 : null),
         IconButton(
             icon: Icon(Icons.videocam),
             color: Colors.blue,
             onPressed: controller != null &&
-                controller.value.isInitialized &&
-                !controller.value.isRecordingVideo
+                    controller.value.isInitialized &&
+                    !controller.value.isRecordingVideo
                 ? onVideoRecordButtonPressed
                 : null),
         IconButton(
@@ -152,19 +160,19 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
               : Icon(Icons.pause),
           color: Colors.blue,
           onPressed: controller != null &&
-              controller.value.isInitialized &&
-              controller.value.isRecordingVideo
+                  controller.value.isInitialized &&
+                  controller.value.isRecordingVideo
               ? (controller != null && controller.value.isRecordingVideo
-              ? onResumeButtonPressed
-              : onPauseButtonPressed)
+                  ? onResumeButtonPressed
+                  : onPauseButtonPressed)
               : null,
         ),
         IconButton(
             icon: const Icon(Icons.stop),
             color: Colors.red,
             onPressed: controller != null &&
-                controller.value.isInitialized &&
-                controller.value.isRecordingVideo
+                    controller.value.isInitialized &&
+                    controller.value.isRecordingVideo
                 ? onStopButtonPressed
                 : null)
       ],
@@ -206,9 +214,9 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
                 groupValue: controller?.description,
                 value: cameraDescription,
                 onChanged:
-                controller != null && controller.value.isRecordingVideo
-                    ? null
-                    : onNewCameraSelected)));
+                    controller != null && controller.value.isRecordingVideo
+                        ? null
+                        : onNewCameraSelected)));
       }
     }
     return Row(children: toggles);
@@ -218,31 +226,31 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   Widget _thumbnailWidget() {
     return Expanded(
         child: Align(
-          alignment: Alignment.centerRight,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              videoController == null && imagePath == null
-                  ? Container()
-                  : SizedBox(
+      alignment: Alignment.centerRight,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          videoController == null && imagePath == null
+              ? Container()
+              : SizedBox(
                   width: 64.0,
                   height: 64.0,
                   child: (videoController == null)
                       ? Image.file(File(imagePath))
                       : Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.pink)),
-                    child: Center(
-                        child: AspectRatio(
-                          child: VideoPlayer(videoController),
-                          aspectRatio: videoController.value.size != null
-                              ? videoController.value.aspectRatio
-                              : 1.0,
-                        )),
-                  ))
-            ],
-          ),
-        ));
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.pink)),
+                          child: Center(
+                              child: AspectRatio(
+                            child: VideoPlayer(videoController),
+                            aspectRatio: videoController.value.size != null
+                                ? videoController.value.aspectRatio
+                                : 1.0,
+                          )),
+                        ))
+        ],
+      ),
+    ));
   }
 
   /// Take Picture
@@ -409,7 +417,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
 
   Future<void> _startVideoPlayer() async {
     final VideoPlayerController vcontroller =
-    VideoPlayerController.file(File(videoPath));
+        VideoPlayerController.file(File(videoPath));
     videoPlayerListener = () {
       if (videoController != null && videoController.value.size != null) {
         // Refreshing the state to update video player with the correct ratio.
@@ -430,28 +438,34 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     await vcontroller.play();
   }
 
+  Future<void> _initCameras() async {
+    try {
+      WidgetsFlutterBinding.ensureInitialized();
+      cameras = await availableCameras();
+    } on CameraException catch (e) {
+      logError(e.code, e.description);
+    }
+  }
+
   void _showCameraException(CameraException e) {
     logError(e.code, e.description);
     showInSnackBar('Error: ${e.code}\n${e.description}');
   }
 }
 
-List<CameraDescription> cameras = [];
-
 class CameraApp extends StatelessWidget {
+  final Question question;
+
+  CameraApp(this.question);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: CameraExampleHome());
+    return MaterialApp(home: RecordVideoPage(question));
   }
 }
 
-Future<void> main() async {
+Future<void> initBindings() async {
   // Fetch the available cameras before initializing the app.
-  try {
-    WidgetsFlutterBinding.ensureInitialized();
-    cameras = await availableCameras();
-  } on CameraException catch (e) {
-    logError(e.code, e.description);
-  }
-  runApp(CameraApp());
+
+  //runApp(CameraApp(question));
 }

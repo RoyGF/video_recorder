@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:video_recorder/models/question.dart';
+import 'package:video_recorder/pages/camera_page.dart';
 
 class MainPage extends StatelessWidget {
-
-  var questions = [
+  final List<Question> questions = [
     Question('Pregunta 1', 10),
     Question('Pregunta 2', 15),
     Question('Pregunta 3', 5)
@@ -15,22 +15,31 @@ class MainPage extends StatelessWidget {
         appBar: AppBar(
             title: Text('Pantalla inicial'), backgroundColor: Colors.red),
         body: ListView(
-          children: _videoCards(),
+          children: _videoCards(context),
         ));
   }
 
-  List<Widget> _videoCards(){
+  /// Creates Video Cards using questions list
+  List<Widget> _videoCards(BuildContext context) {
     final List<Widget> videoCards = [];
-    questions.forEach((question){
-      videoCards.add(_getVideoCard(question));
+    questions.forEach((question) {
+      videoCards.add(_getVideoCard(context, question));
     });
-
     return videoCards;
   }
 
-  Widget _getVideoCard(Question question) {
+  /// create a video card using a Question object
+  Widget _getVideoCard(BuildContext context, Question question) {
     return Card(
-      child: ListTile(title: Text(question.getQuestion()),),
+      child: ListTile(
+        title: Text(question.getQuestion()),
+        leading: Icon(Icons.videocam, color: Colors.red),
+        trailing: Icon(Icons.keyboard_arrow_right, color: Colors.red),
+        onTap: (){
+          final route = MaterialPageRoute(builder: (context) => CameraApp(question));
+          Navigator.push(context, route);
+        },
+      ),
     );
   }
 }
