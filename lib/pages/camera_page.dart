@@ -52,6 +52,9 @@ class _RecordVideoPageState extends State<RecordVideoPage>
   void initState() {
     super.initState();
     _initCameras().then((_) {
+      setState(() {
+        
+      });
       WidgetsBinding.instance.addObserver(this);
     });
   }
@@ -439,12 +442,9 @@ class _RecordVideoPageState extends State<RecordVideoPage>
   }
 
   Future<void> _initCameras() async {
-    try {
-      WidgetsFlutterBinding.ensureInitialized();
+
       cameras = await availableCameras();
-    } on CameraException catch (e) {
-      logError(e.code, e.description);
-    }
+
   }
 
   void _showCameraException(CameraException e) {
