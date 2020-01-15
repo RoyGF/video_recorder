@@ -52,9 +52,7 @@ class _RecordVideoPageState extends State<RecordVideoPage>
   void initState() {
     super.initState();
     _initCameras().then((_) {
-      setState(() {
-        
-      });
+      setState(() {});
       WidgetsBinding.instance.addObserver(this);
     });
   }
