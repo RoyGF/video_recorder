@@ -35,11 +35,18 @@ class MainPage extends StatelessWidget {
         title: Text(question.getQuestion()),
         leading: Icon(Icons.videocam, color: Colors.red),
         trailing: Icon(Icons.keyboard_arrow_right, color: Colors.red),
-        onTap: (){
-          final route = MaterialPageRoute(builder: (context) => CameraApp(question));
-          Navigator.push(context, route);
+        onTap: () {
+          _navigateAndFetchVideoUrl(context, question);
         },
       ),
     );
+  }
+
+  _navigateAndFetchVideoUrl(BuildContext context, Question question) async {
+    final route = MaterialPageRoute(builder: (context) => CameraApp(question));
+    final result = await Navigator.push(context, route) as String;
+
+    String dataResult = result;
+    print(dataResult);
   }
 }

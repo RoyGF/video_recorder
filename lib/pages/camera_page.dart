@@ -14,7 +14,7 @@ class RecordVideoPage extends StatefulWidget {
 
   @override
   _RecordVideoPageState createState() {
-    return _RecordVideoPageState();
+    return _RecordVideoPageState(question);
   }
 }
 
@@ -44,9 +44,12 @@ class _RecordVideoPageState extends State<RecordVideoPage>
   bool enableAudio = true;
   List<CameraDescription> cameras = [];
 
+  final Question question;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
+
+  _RecordVideoPageState(this.question);
 
   @override
   void initState() {
@@ -88,8 +91,23 @@ class _RecordVideoPageState extends State<RecordVideoPage>
           _surfaceCameraView(),
           _captureControlRowWidget(),
           _toggleAudioWidget(),
-          _toggleCameraSelector()
+          _toggleCameraSelector(),
+          _finishButton(context)
         ],
+      ),
+    );
+  }
+
+  Widget _finishButton(BuildContext ctx) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: double.infinity),
+      child: RaisedButton(
+        padding: EdgeInsets.all(20.0),
+        color: Colors.blue,
+        child: Text('Finish'),
+        onPressed: () {
+          Navigator.pop(ctx, 'Return Data test!');
+        },
       ),
     );
   }
@@ -440,11 +458,10 @@ class _RecordVideoPageState extends State<RecordVideoPage>
   }
 
   Future<void> _initCameras() async {
-
-      cameras = await availableCameras();
-
+    cameras = await availableCameras();
   }
 
+  /// Prints camera exception log
   void _showCameraException(CameraException e) {
     logError(e.code, e.description);
     showInSnackBar('Error: ${e.code}\n${e.description}');
@@ -458,12 +475,6 @@ class CameraApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: RecordVideoPage(question));
+    return Scaffold(body: RecordVideoPage(question));
   }
-}
-
-Future<void> initBindings() async {
-  // Fetch the available cameras before initializing the app.
-
-  //runApp(CameraApp(question));
 }
