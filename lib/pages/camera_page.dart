@@ -106,7 +106,8 @@ class _RecordVideoPageState extends State<RecordVideoPage>
         color: Colors.blue,
         child: Text('Finish'),
         onPressed: () {
-          Navigator.pop(ctx, 'Return Data test!');
+          if (videoPath != null)
+            Navigator.pop(ctx, videoPath);
         },
       ),
     );
@@ -316,7 +317,8 @@ class _RecordVideoPageState extends State<RecordVideoPage>
   }
 
   void showInSnackBar(String message) {
-    _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(message)));
+    if (message != null)
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(message)));
   }
 
   void onNewCameraSelected(CameraDescription cameraDescription) async {
