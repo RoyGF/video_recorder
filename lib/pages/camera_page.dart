@@ -55,6 +55,9 @@ class _RecordVideoPageState extends State<RecordVideoPage>
   void initState() {
     super.initState();
     _initCameras().then((_) {
+      if (cameras.isNotEmpty){
+        onNewCameraSelected(cameras[0]);
+      }
       setState(() {});
       WidgetsBinding.instance.addObserver(this);
     });
