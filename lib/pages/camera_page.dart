@@ -285,7 +285,7 @@ class _RecordVideoPageState extends State<RecordVideoPage>
           videoController?.dispose();
           videoController = null;
         });
-        if (filePath != null) showInSnackBar('Picture saved to ${filePath}');
+        if (filePath != null) showInSnackBar('Picture saved to $filePath');
       }
     });
   }
@@ -294,21 +294,18 @@ class _RecordVideoPageState extends State<RecordVideoPage>
   void onVideoRecordButtonPressed() {
     startVideoRecording().then((String filePath) {
       if (mounted) setState(() {});
-      if (filePath != null) showInSnackBar('Saving video to ${filePath}');
     });
   }
 
   void onStopButtonPressed() {
     stopVideoRecording().then((_) {
       if (mounted) setState(() {});
-      showInSnackBar('Video recorded to: $videoPath');
     });
   }
 
   void onPauseButtonPressed() {
     pauseVideoRecording().then((_) {
       if (mounted) setState(() {});
-      showInSnackBar('Video recording paused');
     });
   }
 
@@ -354,7 +351,7 @@ class _RecordVideoPageState extends State<RecordVideoPage>
     final Directory extDir = await getApplicationDocumentsDirectory();
     final String dirPath = '${extDir.path}/Pictures/video_recorder';
     await Directory(dirPath).create(recursive: true);
-    final String filePath = '${dirPath}/${timestamp()}.jpg';
+    final String filePath = '$dirPath/${timestamp()}.jpg';
 
     if (controller.value.isTakingPicture) {
       // A capture is already pending, do nothing

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+
+import 'package:video_player/video_player.dart';
 import 'package:video_recorder/models/question.dart';
 import 'package:video_recorder/pages/camera_page.dart';
+import 'dart:io';
 
 class QuestionListPage extends StatefulWidget {
   final List<Question> questions;
@@ -17,11 +20,23 @@ class _QuestionListPageState extends State<QuestionListPage> {
   final List<Question> questions;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  VideoPlayerController _videoController;
+  VoidCallback videoPlayerListener;
   _QuestionListPageState(this.questions);
+  String videoPath;
+
+  @override
+  void dispose() {
+    super.dispose();
+    _videoController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        floatingActionButton: FloatingActionButton(
+            onPressed:
+                videoPath != null ? () => _startVideoPlayer(videoPath) : () {}),
         key: _scaffoldKey,
         appBar: AppBar(
             title: Text('Pantalla inicial'), backgroundColor: Colors.red),
@@ -39,11 +54,14 @@ class _QuestionListPageState extends State<QuestionListPage> {
     return videoCards;
   }
 
-  /// create a video card using a Question object
+  /// Creates a video card using a Question object
   Widget _getVideoCard(BuildContext context, Question question) {
     return Card(
       child: ListTile(
         title: Text(question.getQuestion()),
+        subtitle: question.hasVideo()
+            ? _thumbnailWidget(question.getVideoPath())
+            : null,
         leading: Icon(Icons.videocam, color: Colors.red),
         trailing: Icon(Icons.keyboard_arrow_right, color: Colors.red),
         onTap: () {
@@ -53,12 +71,45 @@ class _QuestionListPageState extends State<QuestionListPage> {
     );
   }
 
+  /// Video Player Thumbnail
+  Widget _thumbnailWidget(String inVideoPath) {
+    return Center(
+      child: _videoController.value.initialized ? AspectRatio(
+        aspectRatio: _videoController.value.aspectRatio,
+        child: VideoPlayer(_videoController)
+      ) : Container(),
+    );
+  }
+
+  initVideoController(String inVideoPath) {
+    _videoController = VideoPlayerController.file(File(videoPath));
+    _videoController.initialize().then((_){
+      setState((){});
+    });
+  }
+
+  /// Opens Camera Page and waits for video path string callback
   _navigateAndFetchVideoUrl(BuildContext context, Question question) async {
     final route = MaterialPageRoute(builder: (context) => CameraApp(question));
     final result = await Navigator.push(context, route) as String;
 
     String dataResult = result;
-    print(dataResult);
+    videoPath = dataResult;
+    if (dataResult != null) {
+      question.setVideoPath(videoPath);
+      initVideoController(videoPath);
+      setState(() {});
+    }
+  }
+
+  _startVideoPlayer(String videoPath)  {
+    if (videoPath == null)
+      return;
+    if (_videoController.value.initialized){
+      setState(() {
+        _videoController.value.isPlaying ? _videoController.pause() : _videoController.play();
+      });
+    }
   }
 }
 
