@@ -38,7 +38,7 @@ class _QuestionListPageState extends State<QuestionListPage> {
     return Scaffold(
         key: _scaffoldKey,
         floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
+          child: Text('Timer test', textAlign: TextAlign.center,),
           onPressed: (){
                 final route = MaterialPageRoute(builder: (context) => CountDownPage());
                 Navigator.push(context, route);

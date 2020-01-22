@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 
 class CountDownPage extends StatelessWidget {
 
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,15 +45,7 @@ class _CountDownTimerState extends State<CountDownTimer>
           builder: (context, child) {
             return Stack(
               children: <Widget>[
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child:
-                  Container(
-                    color: Colors.amber,
-                    height:
-                    controller.value * MediaQuery.of(context).size.height,
-                  ),
-                ),
+              
                 Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Column(
