@@ -3,27 +3,34 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 class CountDownPage extends StatelessWidget {
+  int _timerDuration;
+
+  CountDownPage(this._timerDuration);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: CountDownTimer()
-    );
+    return Scaffold(body: CountDownTimer(_timerDuration));
   }
 }
 
 class CountDownTimer extends StatefulWidget {
+  final int _timerDuration;
+  CountDownTimer(this._timerDuration);
+
   @override
-  _CountDownTimerState createState() => _CountDownTimerState();
+  _CountDownTimerState createState() => _CountDownTimerState(_timerDuration);
 }
 
 class _CountDownTimerState extends State<CountDownTimer>
     with TickerProviderStateMixin {
   AnimationController controller;
+  int _timerDuration;
+
+  _CountDownTimerState(this._timerDuration);
 
   String get timerString {
     Duration duration = controller.duration * controller.value;
-    return '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
+    return '${duration.inMinutes}:${(duration.inSeconds + 1 % 60).toString().padLeft(2, '0')}';
   }
 
   @override
@@ -31,7 +38,7 @@ class _CountDownTimerState extends State<CountDownTimer>
     super.initState();
     controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 10),
+      duration: Duration(seconds: _timerDuration),
     );
   }
 
@@ -45,52 +52,35 @@ class _CountDownTimerState extends State<CountDownTimer>
           builder: (context, child) {
             return Stack(
               children: <Widget>[
-              
                 Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Expanded(
-                        child: Align(
-                          alignment: FractionalOffset.center,
-                          child: AspectRatio(
-                            aspectRatio: 1.0,
-                            child: Stack(
-                              children: <Widget>[
-                                Positioned.fill(
-                                  child: CustomPaint(
-                                      painter: CustomTimerPainter(
-                                        animation: controller,
-                                        backgroundColor: Colors.white,
-                                        color: themeData.indicatorColor,
-                                      )),
+                      Align(
+                        alignment: FractionalOffset.center,
+                        child: AspectRatio(
+                          aspectRatio: 1,
+                          child: Stack(
+                            children: <Widget>[
+                              Positioned(
+                                height: 50.0,
+                                width: 50.0,
+                                child: CustomPaint(
+                                    painter: CustomTimerPainter(
+                                  animation: controller,
+                                  backgroundColor: Colors.white,
+                                  color: themeData.indicatorColor,
+                                )),
+                              ),
+                              Positioned(
+                                left: 12,
+                                top: 16,
+                                child: Text(
+                                  timerString,
+                                  style: TextStyle(color: Colors.black),
                                 ),
-                                Align(
-                                  alignment: FractionalOffset.center,
-                                  child: Column(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      Text(
-                                        "Count Down Timer",
-                                        style: TextStyle(
-                                            fontSize: 20.0,
-                                            color: Colors.black),
-                                      ),
-                                      Text(
-                                        timerString,
-                                        style: TextStyle(
-                                            fontSize: 112.0,
-                                            color: Colors.black),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -122,6 +112,9 @@ class _CountDownTimerState extends State<CountDownTimer>
           }),
     );
   }
+
+  
+
 }
 
 class CustomTimerPainter extends CustomPainter {
@@ -138,7 +131,7 @@ class CustomTimerPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint()
       ..color = backgroundColor
-      ..strokeWidth = 10.0
+      ..strokeWidth = 3.0
       ..strokeCap = StrokeCap.butt
       ..style = PaintingStyle.stroke;
 

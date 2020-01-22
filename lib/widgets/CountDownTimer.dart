@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -40,9 +41,9 @@ class _CountDownTimerState extends State<CountDownTimer>
   @override
   Widget build(BuildContext context) {
     ThemeData themeData = Theme.of(context);
-    return Scaffold(
-      backgroundColor: Colors.white10,
-      body: AnimatedBuilder(
+    return Container(
+      decoration: BoxDecoration(color: Colors.red),
+      child: AnimatedBuilder(
           animation: controller,
           builder: (context, child) {
             return Stack(

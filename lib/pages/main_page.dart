@@ -40,7 +40,7 @@ class _QuestionListPageState extends State<QuestionListPage> {
         floatingActionButton: FloatingActionButton(
           child: Text('Timer test', textAlign: TextAlign.center,),
           onPressed: (){
-                final route = MaterialPageRoute(builder: (context) => CountDownPage());
+                final route = MaterialPageRoute(builder: (context) => CountDownPage(15));
                 Navigator.push(context, route);
           },
           ),
