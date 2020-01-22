@@ -5,6 +5,8 @@ import 'package:video_recorder/models/question.dart';
 import 'package:video_recorder/pages/camera_page.dart';
 import 'dart:io';
 
+import 'package:video_recorder/pages/countdount_page.dart';
+
 class QuestionListPage extends StatefulWidget {
   final List<Question> questions;
 
@@ -34,10 +36,14 @@ class _QuestionListPageState extends State<QuestionListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButton: FloatingActionButton(
-            onPressed:
-                videoPath != null ? () => _startVideoPlayer(videoPath) : () {}),
         key: _scaffoldKey,
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: (){
+                final route = MaterialPageRoute(builder: (context) => CountDownPage());
+                Navigator.push(context, route);
+          },
+          ),
         appBar: AppBar(
             title: Text('Pantalla inicial'), backgroundColor: Colors.red),
         body: ListView(

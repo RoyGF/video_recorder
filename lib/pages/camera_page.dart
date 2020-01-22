@@ -55,7 +55,7 @@ class _RecordVideoPageState extends State<RecordVideoPage>
   void initState() {
     super.initState();
     _initCameras().then((_) {
-      if (cameras.isNotEmpty){
+      if (cameras.isNotEmpty) {
         onNewCameraSelected(cameras[0]);
       }
       setState(() {});
@@ -91,6 +91,7 @@ class _RecordVideoPageState extends State<RecordVideoPage>
       ),
       body: Column(
         children: <Widget>[
+          _questionInfo(question),
           _surfaceCameraView(),
           _captureControlRowWidget(),
           _toggleAudioWidget(),
@@ -98,6 +99,15 @@ class _RecordVideoPageState extends State<RecordVideoPage>
           _finishButton(context)
         ],
       ),
+    );
+  }
+
+  Widget _questionInfo(Question question) {
+    return Row(
+      children: <Widget>[
+        Expanded(child: Text(question.getQuestion())),
+        Text('Tiempo: ${question.getTimeToRecord()}')
+      ],
     );
   }
 
@@ -109,8 +119,7 @@ class _RecordVideoPageState extends State<RecordVideoPage>
         color: Colors.blue,
         child: Text('Finish'),
         onPressed: () {
-          if (videoPath != null)
-            Navigator.pop(ctx, videoPath);
+          if (videoPath != null) Navigator.pop(ctx, videoPath);
         },
       ),
     );
