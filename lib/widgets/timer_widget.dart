@@ -4,22 +4,29 @@ import 'package:flutter/material.dart';
 
 class CountDownTimer extends StatefulWidget {
   final int _timerDuration;
-  CountDownTimer(this._timerDuration);
+  final TimerController _timerController;
+  CountDownTimer(this._timerDuration, this._timerController);
 
   @override
-  _CountDownTimerState createState() => _CountDownTimerState(_timerDuration);
+  _CountDownTimerState createState() => _CountDownTimerState(_timerDuration, _timerController);
 }
 
 class _CountDownTimerState extends State<CountDownTimer>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin{
+
   AnimationController controller;
   int _timerDuration;
+  TimerController _timerController;
 
-  _CountDownTimerState(this._timerDuration);
+  _CountDownTimerState(this._timerDuration, this._timerController);
+
+  void setTimerDuration(int seconds) {
+    this._timerDuration = seconds;
+  }
 
   String get timerString {
     Duration duration = controller.duration * controller.value;
-    return '${duration.inMinutes}:${(duration.inSeconds + 1 % 60).toString().padLeft(2, '0')}';
+    return '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
   }
 
   @override
@@ -29,14 +36,16 @@ class _CountDownTimerState extends State<CountDownTimer>
       vsync: this,
       duration: Duration(seconds: _timerDuration),
     );
+    _timerController.setAnimationController(controller);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(width: 50.0, height: 50.0, child: getStack());
+    return Container(width: 50.0, height: 50.0, child: getbody());
   }
 
-  Widget getStack() {
+  /// Gets Widget UI body
+  Widget getbody() {
     var stack = Stack(
       children: <Widget>[
         Positioned(
@@ -63,6 +72,7 @@ class _CountDownTimerState extends State<CountDownTimer>
   }
 }
 
+/// Circular Animation Painter
 class CustomTimerPainter extends CustomPainter {
   CustomTimerPainter({
     this.animation,
@@ -93,4 +103,34 @@ class CustomTimerPainter extends CustomPainter {
         color != old.color ||
         backgroundColor != old.backgroundColor;
   }
+}
+
+/// Timer Controller interface.
+class TimerController {
+  AnimationController controller;
+
+  void setAnimationController(AnimationController animationController) {
+    this.controller = animationController;
+  }
+
+  /// Starts Timer.
+  void start() {
+    if (!controller.isAnimating) {
+      controller.reverse(
+          from: controller.value == 0.0 ? 1.0 : controller.value);
+    }
+  }
+
+  /// Stops Timer.
+  void stop() {
+    if (controller.isAnimating) controller.stop();
+  }
+
+  /// Pauses Timer.
+  void pause() {}
+}
+
+/// Timer Callback when it reaches zero.
+class TimerCallback {
+  void onTimerFinish() {}
 }

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_recorder/models/question.dart';
-import 'package:video_recorder/widgets/CountDownTimer.dart';
+import 'package:video_recorder/widgets/timer_widget.dart';
 
 class RecordVideoPage extends StatefulWidget {
   final Question question;
@@ -109,8 +109,7 @@ class _RecordVideoPageState extends State<RecordVideoPage>
         Expanded(
             child: Text(
           question.getQuestion(),
-        )),
-        CountDownTimer(13)
+        ))
       ],
     );
   }
