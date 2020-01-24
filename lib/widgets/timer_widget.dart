@@ -8,12 +8,12 @@ class CountDownTimer extends StatefulWidget {
   CountDownTimer(this._timerDuration, this._timerController);
 
   @override
-  _CountDownTimerState createState() => _CountDownTimerState(_timerDuration, _timerController);
+  _CountDownTimerState createState() =>
+      _CountDownTimerState(_timerDuration, _timerController);
 }
 
 class _CountDownTimerState extends State<CountDownTimer>
-    with TickerProviderStateMixin{
-
+    with TickerProviderStateMixin {
   AnimationController controller;
   int _timerDuration;
   TimerController _timerController;

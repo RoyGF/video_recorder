@@ -7,7 +7,6 @@ class TimerTestPage extends StatefulWidget {
 }
 
 class _TimerTestPageState extends State<TimerTestPage> {
-
   TimerController _timerController;
   AnimationController controller;
 
@@ -36,22 +35,22 @@ class _TimerTestPageState extends State<TimerTestPage> {
   Widget getControllerButtons() {
     Widget row = Row(
       children: <Widget>[
-        FlatButton(child: Text('Start'), onPressed: (){
-          _timerController.start();
-        }),
-        FlatButton(child: Text('Pause'), onPressed: (){
-          _timerController.stop();
-        })
-        ],
+        FlatButton(
+            child: Text('Start'),
+            onPressed: () {
+              _timerController.start();
+            }),
+        FlatButton(
+            child: Text('Pause'),
+            onPressed: () {
+              _timerController.stop();
+            })
+      ],
     );
     return row;
   }
 
-  void startTimer(){
+  void startTimer() {}
 
-  }
-
-  void pauseTimer(){
-
-  }
+  void pauseTimer() {}
 }

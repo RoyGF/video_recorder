@@ -38,12 +38,16 @@ class _QuestionListPageState extends State<QuestionListPage> {
     return Scaffold(
         key: _scaffoldKey,
         floatingActionButton: FloatingActionButton(
-          child: Text('Timer test', textAlign: TextAlign.center,),
-          onPressed: (){
-                final route = MaterialPageRoute(builder: (context) => TimerTestPage());
-                Navigator.push(context, route);
-          },
+          child: Text(
+            'Timer test',
+            textAlign: TextAlign.center,
           ),
+          onPressed: () {
+            final route =
+                MaterialPageRoute(builder: (context) => TimerTestPage());
+            Navigator.push(context, route);
+          },
+        ),
         appBar: AppBar(
             title: Text('Pantalla inicial'), backgroundColor: Colors.red),
         body: ListView(
@@ -80,17 +84,18 @@ class _QuestionListPageState extends State<QuestionListPage> {
   /// Video Player Thumbnail
   Widget _thumbnailWidget(String inVideoPath) {
     return Center(
-      child: _videoController.value.initialized ? AspectRatio(
-        aspectRatio: _videoController.value.aspectRatio,
-        child: VideoPlayer(_videoController)
-      ) : Container(),
+      child: _videoController.value.initialized
+          ? AspectRatio(
+              aspectRatio: _videoController.value.aspectRatio,
+              child: VideoPlayer(_videoController))
+          : Container(),
     );
   }
 
   initVideoController(String inVideoPath) {
     _videoController = VideoPlayerController.file(File(videoPath));
-    _videoController.initialize().then((_){
-      setState((){});
+    _videoController.initialize().then((_) {
+      setState(() {});
     });
   }
 
@@ -108,12 +113,13 @@ class _QuestionListPageState extends State<QuestionListPage> {
     }
   }
 
-  _startVideoPlayer(String videoPath)  {
-    if (videoPath == null)
-      return;
-    if (_videoController.value.initialized){
+  _startVideoPlayer(String videoPath) {
+    if (videoPath == null) return;
+    if (_videoController.value.initialized) {
       setState(() {
-        _videoController.value.isPlaying ? _videoController.pause() : _videoController.play();
+        _videoController.value.isPlaying
+            ? _videoController.pause()
+            : _videoController.play();
       });
     }
   }

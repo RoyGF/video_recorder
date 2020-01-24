@@ -8,16 +8,13 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Camera Recorder',
       initialRoute: '/',
       routes: getApplicationRoutes(),
       onGenerateRoute: (settings) {
-        return MaterialPageRoute(
-          builder: (BuildContext context) => MainPage()
-        );
+        return MaterialPageRoute(builder: (BuildContext context) => MainPage());
       },
     );
   }
