@@ -19,20 +19,23 @@ class _RecordVideoState extends State<RecordVideo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Timer test'),
-        ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-                child: CountDownTimer(
-              timerDuration: 10,
-              timerController: _timerController,
-            )),
-            getControllerButtons()
-          ],
-        ));
+      appBar: AppBar(
+        title: Text('Timer test'),
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          CountDownTimer(
+            onTimerFinish: () {
+              print('Timer has finished!');
+            },
+            timerDuration: 5,
+            timerController: _timerController,
+          ),
+          getControllerButtons()
+        ],
+      ),
+    );
   }
 
   Widget getControllerButtons() {

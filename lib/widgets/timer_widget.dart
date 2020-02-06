@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 class CountDownTimer extends StatefulWidget {
   final int timerDuration;
   final TimerController timerController;
-  CountDownTimer({this.timerDuration, this.timerController});
+  final Function onTimerFinish;
+  CountDownTimer({this.timerDuration, this.timerController, this.onTimerFinish});
 
   @override
   _CountDownTimerState createState() =>
@@ -17,9 +18,11 @@ class _CountDownTimerState extends State<CountDownTimer>
   AnimationController controller;
 
   String get timerString {
-    Duration duration =
-        controller.duration * controller.value; 
-    return '${duration.inHours}:${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
+    Duration duration = controller.duration * controller.value; 
+    if (controller.value == 0.0){
+      duration = controller.duration;
+    }
+    return '${duration.inMinutes}:${(duration.inSeconds % 60).toString()}';
   }
 
   @override
@@ -29,12 +32,23 @@ class _CountDownTimerState extends State<CountDownTimer>
       vsync: this,
       duration: Duration(seconds: widget.timerDuration),
     );
+    controller.addListener((){
+      setState(() {
+        if (controller.value == 0.0){
+          print('reaches zero!');
+        }
+      });
+    });
     widget.timerController.setAnimationController(controller);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(width: 60.0, height: 60.0, child: getbody());
+    return Container(
+      margin: EdgeInsets.all(20.0),
+      width: 50.0,
+      height: 50.0,
+      child: getbody());
   }
 
   /// Gets Widget UI body
@@ -42,9 +56,7 @@ class _CountDownTimerState extends State<CountDownTimer>
     var stack = Stack(
       children: <Widget>[
         InPositioned(controller: controller),
-        Positioned(
-          left: 12,
-          top: 16,
+        Center(
           child: Text(
             timerString,
             style: TextStyle(color: Colors.black),
@@ -101,7 +113,7 @@ class CustomTimerPainter extends CustomPainter {
 
     canvas.drawCircle(size.center(Offset.zero), size.width / 2.0, paint);
     paint.color = color;
-    double progress = (1.0 - animation.value) * 2 * math.pi;
+    double progress = -(1.0 - animation.value) * 2 * math.pi;
     canvas.drawArc(Offset.zero & size, math.pi * 1.5, -progress, false, paint);
   }
 
