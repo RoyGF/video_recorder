@@ -6,16 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_recorder/models/question.dart';
-import 'package:video_recorder/widgets/timer_widget.dart';
 
 class RecordVideoPage extends StatefulWidget {
   final Question question;
 
-  RecordVideoPage(this.question);
+  RecordVideoPage({this.question});
 
   @override
   _RecordVideoPageState createState() {
-    return _RecordVideoPageState(question);
+    return _RecordVideoPageState();
   }
 }
 
@@ -37,6 +36,7 @@ void logError(String code, String message) =>
 
 class _RecordVideoPageState extends State<RecordVideoPage>
     with WidgetsBindingObserver {
+
   CameraController controller;
   String imagePath;
   String videoPath;
@@ -45,12 +45,9 @@ class _RecordVideoPageState extends State<RecordVideoPage>
   bool enableAudio = true;
   List<CameraDescription> cameras = [];
 
-  final Question question;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
-
-  _RecordVideoPageState(this.question);
 
   @override
   void initState() {
@@ -92,7 +89,6 @@ class _RecordVideoPageState extends State<RecordVideoPage>
       ),
       body: Column(
         children: <Widget>[
-          _questionInfo(question),
           _surfaceCameraView(),
           _captureControlRowWidget(),
           _toggleAudioWidget(),
@@ -100,17 +96,6 @@ class _RecordVideoPageState extends State<RecordVideoPage>
           _finishButton(context)
         ],
       ),
-    );
-  }
-
-  Widget _questionInfo(Question question) {
-    return Row(
-      children: <Widget>[
-        Expanded(
-            child: Text(
-          question.getQuestion(),
-        ))
-      ],
     );
   }
 
@@ -482,13 +467,3 @@ class _RecordVideoPageState extends State<RecordVideoPage>
   }
 }
 
-class CameraApp extends StatelessWidget {
-  final Question question;
-
-  CameraApp(this.question);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(body: RecordVideoPage(question));
-  }
-}

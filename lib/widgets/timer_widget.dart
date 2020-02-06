@@ -3,30 +3,23 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 class CountDownTimer extends StatefulWidget {
-  final int _timerDuration;
-  final TimerController _timerController;
-  CountDownTimer(this._timerDuration, this._timerController);
+  final int timerDuration;
+  final TimerController timerController;
+  CountDownTimer({this.timerDuration, this.timerController});
 
   @override
   _CountDownTimerState createState() =>
-      _CountDownTimerState(_timerDuration, _timerController);
+      _CountDownTimerState();
 }
 
 class _CountDownTimerState extends State<CountDownTimer>
     with TickerProviderStateMixin {
   AnimationController controller;
-  int _timerDuration;
-  TimerController _timerController;
-
-  _CountDownTimerState(this._timerDuration, this._timerController);
-
-  void setTimerDuration(int seconds) {
-    this._timerDuration = seconds;
-  }
 
   String get timerString {
-    Duration duration = controller.duration * controller.value;
-    return '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
+    Duration duration =
+        controller.duration * controller.value; 
+    return '${duration.inHours}:${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
   }
 
   @override
@@ -34,30 +27,21 @@ class _CountDownTimerState extends State<CountDownTimer>
     super.initState();
     controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: _timerDuration),
+      duration: Duration(seconds: widget.timerDuration),
     );
-    _timerController.setAnimationController(controller);
+    widget.timerController.setAnimationController(controller);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(width: 50.0, height: 50.0, child: getbody());
+    return Container(width: 60.0, height: 60.0, child: getbody());
   }
 
   /// Gets Widget UI body
   Widget getbody() {
     var stack = Stack(
       children: <Widget>[
-        Positioned(
-          height: 50.0,
-          width: 50.0,
-          child: CustomPaint(
-              painter: CustomTimerPainter(
-            animation: controller,
-            backgroundColor: Colors.white,
-            color: Colors.blue,
-          )),
-        ),
+        InPositioned(controller: controller),
         Positioned(
           left: 12,
           top: 16,
@@ -69,6 +53,30 @@ class _CountDownTimerState extends State<CountDownTimer>
       ],
     );
     return stack;
+  }
+}
+
+class InPositioned extends StatelessWidget {
+  const InPositioned({
+    Key key,
+    @required this.controller,
+  }) : super(key: key);
+
+  final AnimationController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      height: 50.0,
+      width: 50.0,
+      child: CustomPaint(
+        painter: CustomTimerPainter(
+          animation: controller,
+          backgroundColor: Colors.white,
+          color: Colors.blue,
+        ),
+      ),
+    );
   }
 }
 

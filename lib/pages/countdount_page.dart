@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:video_recorder/widgets/timer_widget.dart';
 
-class TimerTestPage extends StatefulWidget {
+class RecordVideo extends StatefulWidget {
   @override
-  _TimerTestPageState createState() => _TimerTestPageState();
+  _RecordVideoState createState() => _RecordVideoState();
 }
 
-class _TimerTestPageState extends State<TimerTestPage> {
+class _RecordVideoState extends State<RecordVideo> {
   TimerController _timerController;
   AnimationController controller;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _timerController = new TimerController();
   }
@@ -26,7 +25,11 @@ class _TimerTestPageState extends State<TimerTestPage> {
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Container(child: CountDownTimer(13, _timerController)),
+            Container(
+                child: CountDownTimer(
+              timerDuration: 10,
+              timerController: _timerController,
+            )),
             getControllerButtons()
           ],
         ));

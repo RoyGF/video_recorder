@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:video_player/video_player.dart';
 import 'package:video_recorder/models/question.dart';
-import 'package:video_recorder/pages/camera_page.dart';
 import 'dart:io';
 
 import 'package:video_recorder/pages/countdount_page.dart';
@@ -36,23 +35,19 @@ class _QuestionListPageState extends State<QuestionListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: _scaffoldKey,
-        floatingActionButton: FloatingActionButton(
-          child: Text(
-            'Timer test',
-            textAlign: TextAlign.center,
-          ),
+      key: _scaffoldKey,
+      appBar:
+          AppBar(title: Text('Pantalla inicial'), backgroundColor: Colors.red),
+      body: Center(
+        child: RaisedButton(
+          child: Text('Timer test'),
           onPressed: () {
-            final route =
-                MaterialPageRoute(builder: (context) => TimerTestPage());
+            final route = MaterialPageRoute(builder: (context) => RecordVideo());
             Navigator.push(context, route);
           },
         ),
-        appBar: AppBar(
-            title: Text('Pantalla inicial'), backgroundColor: Colors.red),
-        body: ListView(
-          children: _videoCards(context),
-        ));
+      ),
+    );
   }
 
   /// Creates Video Cards using questions list
@@ -87,7 +82,8 @@ class _QuestionListPageState extends State<QuestionListPage> {
       child: _videoController.value.initialized
           ? AspectRatio(
               aspectRatio: _videoController.value.aspectRatio,
-              child: VideoPlayer(_videoController))
+              child: VideoPlayer(_videoController),
+            )
           : Container(),
     );
   }
@@ -101,7 +97,7 @@ class _QuestionListPageState extends State<QuestionListPage> {
 
   /// Opens Camera Page and waits for video path string callback
   _navigateAndFetchVideoUrl(BuildContext context, Question question) async {
-    final route = MaterialPageRoute(builder: (context) => CameraApp(question));
+    final route = MaterialPageRoute(builder: (context) => RecordVideo());
     final result = await Navigator.push(context, route) as String;
 
     String dataResult = result;
@@ -113,6 +109,7 @@ class _QuestionListPageState extends State<QuestionListPage> {
     }
   }
 
+  /// TODO Check this method and connect it to the main code.
   _startVideoPlayer(String videoPath) {
     if (videoPath == null) return;
     if (_videoController.value.initialized) {
